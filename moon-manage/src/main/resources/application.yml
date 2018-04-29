@@ -1,0 +1,32 @@
+logging:
+  path: ./logs
+  file: manage.log
+  level: info
+spring:
+  application:
+    name: manage
+  resources:
+    static-locations: classpath:/
+  #thymeleaf:
+  #  suffix: .html
+  #  mode: LEGACYHTML5
+  #  encoding: UTF-8
+  freemarker:
+      cache: false
+      charset: UTF-8
+      suffix: .html
+      expose-request-attributes: true
+      request-context-attribute: request
+      settings:
+        number_format: "#"
+  profiles:
+    active: dev
+mybatis:
+  mapper-locations: org/moon/manage/**/mapper/*.xml
+  type-aliases-package: org.moon.manage.**
+  type-handlers-package: org.moon.manage.framework
+  configuration:
+    map-underscore-to-camel-case: true
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true

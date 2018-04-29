@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="false" scanPeriod="30 seconds">
+    <!-- 环境变量 -->
+	<springProperty scope="context" name="logPath" source="logging.path" defaultValue="./logs"/>
+    <springProperty scope="context" name="logLevel" source="logging.level" defaultValue="DEBUG"/>
+    <springProperty scope="context" name="logFile" source="logging.file" defaultValue="logback.log"/>
+    <springProperty scope="context" name="maxHistory" source="logging.maxHistory" defaultValue="365"/>
+    <springProperty scope="context" name="asyncQueueSize" source="logging.asyncQueueSize" defaultValue="512"/>
+    <springProperty scope="context" name="logPattern" source="logging.pattern" defaultValue="%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n"/>
+    <!-- ConsoleAppender -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder charset="UTF-8">
+            <pattern>${logPattern}</pattern>
+        </encoder>
+    </appender>
+    <!-- RollingFileAppender -->
+    <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logPath}/${logFile}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${logPath}/${logFile}.%d{yyyy-MM-dd}</fileNamePattern>
+            <maxHistory>${maxHistory}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${logPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 异步输出 -->
+    <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+        <queueSize>${asyncQueueSize}</queueSize>
+        <!-- 添加附加的appender,最多只能添加一个 -->
+        <appender-ref ref="RollingFile"/>
+    </appender>
+
+    <!-- spring 默认配置 -->
+    <logger name="org.apache.catalina.startup.DigesterFactory" level="ERROR"/>
+    <logger name="org.apache.catalina.util.LifecycleBase" level="ERROR"/>
+    <logger name="org.apache.coyote.http11.Http11NioProtocol" level="WARN"/>
+    <logger name="org.apache.sshd.common.util.SecurityUtils" level="WARN"/>
+    <logger name="org.apache.tomcat.util.net.NioSelectorPool" level="WARN"/>
+    <logger name="org.crsh.plugin" level="WARN"/>
+    <logger name="org.crsh.ssh" level="WARN"/>
+    <logger name="org.eclipse.jetty.util.component.AbstractLifeCycle" level="ERROR"/>
+    <logger name="org.hibernate.validator.internal.util.Version" level="WARN"/>
+
+    <root level="${logLevel}">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ASYNC"/>
+    </root>
+</configuration>
